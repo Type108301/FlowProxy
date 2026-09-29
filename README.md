@@ -10,16 +10,21 @@ AIC 算法主题赛（AI+力学）开放式赛题工程仓库。
 
 ## 仓库分支
 
-`main` 只放可复用代码：几何、数据集构建、UNetEx / FNO、OpenFOAM 出数和演示。训练标签不进 `main`，每个人的 label 分开放，避免和组员混在同一次提交里。
+`main` 只放可复用代码：几何、数据集构建、UNetEx / FNO、OpenFOAM 出数和演示。训练标签不进 `main`。
 
-个人标签仍放在代码原来读取的路径上，只是活在各自的分支里：
+`tyx` 只放数据，里面没有代码。两份文件走 Git LFS：
 
-| 分支 | 内容 |
-| --- | --- |
-| `main` | 可复用代码，不含 h5 |
-| `tyx` | `main` 的代码，另加圆柱 `data/processed/dataset.h5`，以及圆柱加三角形 `data/processed/dataset_triangle.h5` |
+- `data/processed/dataset.h5`：36 组圆柱
+- `data/processed/dataset_triangle.h5`：36 组圆柱加 36 组三角形
 
-这两份 h5 走 Git LFS。OpenFOAM 原算例在 `data/raw/cases/`，体积大约 31 GB，不放进仓库。
+不要把 `tyx` 检出到代码目录，工作区会变成只剩数据。已经在 `main` 上时，单独取出标签：
+
+```bash
+git fetch origin tyx
+git restore --source=origin/tyx --worktree -- data/processed/dataset.h5 data/processed/dataset_triangle.h5
+```
+
+OpenFOAM 原算例在 `data/raw/cases/`，体积大约 31 GB，不放进仓库。
 
 | 项 | 现状（2026-09-23） |
 | --- | --- |

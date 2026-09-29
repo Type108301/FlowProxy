@@ -4,7 +4,7 @@
 - `processed/dataset.h5`：36 组圆柱，插值后约 403 MB，2026-09-23 写出。在 `tyx` 分支
 - `processed/dataset_triangle.h5`：上述 36 组圆柱，加上 36 组等边三角形，约 809 MB。在 `tyx` 分支
 
-`main` 不含这些 h5。圆柱和三角形标签只在 `tyx`，路径与训练脚本一致，用 Git LFS 存放。`processed/triangle_cases/*.npz` 已并进 `dataset_triangle.h5`，不另存一份。
+`main` 不含这些 h5。`tyx` 分支里只有这两份文件，没有代码，用 Git LFS 存放。`processed/triangle_cases/*.npz` 已并进 `dataset_triangle.h5`，不另存一份。
 
 h5 结构是 `cases/<case_id>/`：
 
