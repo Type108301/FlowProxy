@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FlowProxy · 二维流场神经代理</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="mark">FP</div>
+      <div>
+        <strong>FLOWPROXY</strong>
+        <small>二维流场神经代理</small>
+      </div>
+    </div>
+    <nav>
+      <button type="button" data-page="highlights" class="active">产品亮点</button>
+      <button type="button" data-page="studio">交互风洞台</button>
+      <button type="button" data-page="compare">双模型分工</button>
+    </nav>
+    <div class="header-meta" id="deviceMeta">正在连接后端…</div>
+  </header>
+
+  <main>
+    <section class="view active" id="page-highlights">
+      <div class="kicker">OpenFOAM 真值 · UNetEx 几何 · FNO 时序</div>
+      <h1>一次非定常绕流，<br />变成可以拨动的涡街。</h1>
+      <p class="lede">
+        传统 CFD 扫一组圆柱就要数分钟。这里用 OpenFOAM 的二维不可压解做标签，让几何网络先给出速度和压力的形态，再让傅里叶神经算子沿时间把卡门涡街往前推。云图、流线、误差和力系数放在同一张操作台上。
+      </p>
+      <div class="hero-grid">
+        <div class="panel hero-stage">
+          <canvas id="heroCanvas" width="840" height="480"></canvas>
+          <div class="stage-cap">
+            <span id="heroCap">Re 100 · 居中 · D = 1 · 流向速度</span>
+            <span>流线来自 CFD 真值</span>
+          </div>
+        </div>
+        <div class="panel hero-side" id="heroStats"></div>
+      </div>
+
+      <div class="bento">
+        <article class="card">
+          <div class="idx">01 · 任务</div>
+          <h3>不只给定常终态，要看见涡脱落。</h3>
+          <p>DeepCFD 一类网络停在定常层流。本作品锁在二维圆柱绕流的有限时间窗，播放分离、涡对和尾迹摆动。雷诺数覆盖 80 到 200。</p>
+          <button class="link" type="button" data-jump="truth">去风洞台播放涡街</button>
+        </article>
+        <article class="card">
+          <div class="idx">02 · 分工</div>
+          <h3>换几何和推时间，各用一个模型。</h3>
+          <p>UNetEx 吃障碍物 SDF、流体掩膜、壁面距离和雷诺数，立刻给一张快照。FNO 再吃前 4 帧，外推下一帧。谁擅长什么，用同一套数据对照，而不是只报一个 loss。</p>
+          <button class="link" type="button" data-jump="fno">看 FNO 跟上涡街</button>
+        </article>
+        <article class="card">
+          <div class="idx">03 · 对照方式</div>
+          <h3>真值、预测、误差同时在场。</h3>
+          <p>评委和使用者要的是并排云图，不是一张误差表。快照模型在时间轴上是停住的，时序模型会跟着走，这个差别在三视图里直接看得见。</p>
+          <button class="link" type="button" data-jump="unetex">看快照为什么跟不住</button>
+        </article>
+        <article class="card">
+          <div class="idx">04 · 可信</div>
+          <h3>标签来自 icoFoam，力系数来自求解器。</h3>
+          <p>36 组算例：Re × 圆心纵向偏移 × 直径。场量是 Ux、Uy、p。阻力、升力从 forceCoeffs 读出，游标和当前帧的物理时间对齐。</p>
+          <button class="link" type="button" data-jump="truth">看 Cd / Cl</button>
+        </article>
+        <article class="card">
+          <div class="idx">05 · 力学约束</div>
+          <h3>连续性残差和壁面速度摆在台面上。</h3>
+          <p>训练里散度惩罚和物体内速度惩罚会回传。交互台对当前帧重算 |∇·u| 和固体区速度，避免“看起来像、散度很大”。</p>
+          <button class="link" type="button" data-jump="fno">打开物理读数</button>
+        </article>
+        <article class="card">
+          <div class="idx">06 · 用法</div>
+          <h3>给教学演示和二维概念预览，不替代求解器。</h3>
+          <p>换 Re、换偏心、换直径，场和力一起更新。可疑工况仍交回 CFD。边界写清楚：二维、不可压、低雷诺数圆柱。</p>
+          <button class="link" type="button" data-jump="studio">进入操作台</button>
+        </article>
+      </div>
+
+      <div class="pipeline">
+        <div class="panel pipe"><i>A</i><h3>真值生成</h3><p>参数化圆柱，blockMesh 与 snappyHexMesh，icoFoam 推进。Fluent 不作为数据源。</p></div>
+        <div class="panel pipe"><i>B</i><h3>数据工程</h3><p>VTK 插到 64×64。四通道几何编码对齐 DeepCFD：SDF、掩膜、壁距、Re。</p></div>
+        <div class="panel pipe"><i>C</i><h3>代理模型</h3><p>UNetEx 做几何到场。FNO-2d 做历史到未来。损失以相对 L2 为主，并监控散度。</p></div>
+        <div class="panel pipe"><i>D</i><h3>可视化</h3><p>这一页就是方案里的交互系统：选几何、播动画、看误差和力系数。</p></div>
+      </div>
+      <p class="note" id="overviewNotes"></p>
+    </section>
+
+    <section class="view" id="page-studio">
+      <div class="panel deck">
+        <div class="ctrl">
+          <span>雷诺数</span>
+          <div class="seg" id="segRe"></div>
+        </div>
+        <div class="ctrl">
+          <span>纵向位置 cy</span>
+          <div class="seg" id="segCy"></div>
+        </div>
+        <div class="ctrl">
+          <span>直径 D</span>
+          <div class="seg" id="segD"></div>
+        </div>
+        <div class="ctrl">
+          <span>场量</span>
+          <div class="seg" id="segField"></div>
+        </div>
+        <div class="ctrl">
+          <span>对照</span>
+          <div class="seg" id="segMode"></div>
+        </div>
+        <div class="ctrl">
+          <span>叠加</span>
+          <button type="button" class="toggle on" id="streamToggle">流线</button>
+        </div>
+      </div>
+      <p class="mode-line" id="modeLine"></p>
+      <div class="studio-grid">
+        <div class="panel stage-wrap">
+          <div class="triptych" id="triptych">
+            <div class="pane" id="paneTruth">
+              <label>CFD 真值 <b id="capTruth"></b></label>
+              <canvas id="cfdCanvas" width="840" height="480"></canvas>
+            </div>
+            <div class="pane" id="panePred">
+              <label>代理预测 <b id="capPred"></b></label>
+              <canvas id="predCanvas" width="840" height="480"></canvas>
+            </div>
+            <div class="pane" id="paneErr">
+              <label>绝对误差 <b id="capErr"></b></label>
+              <canvas id="errCanvas" width="840" height="480"></canvas>
+            </div>
+          </div>
+          <div class="legend">
+            <span id="scaleMin">0</span>
+            <div class="bar" id="colorBar"></div>
+            <span id="scaleMax">1</span>
+          </div>
+          <div class="timeline">
+            <button type="button" id="playBtn">暂停</button>
+            <input id="scrub" type="range" min="0" max="100" value="0" />
+            <span class="mono" id="timeRead">t = 0</span>
+          </div>
+          <canvas class="force-canvas" id="forceCanvas" width="960" height="180"></canvas>
+          <div class="stage-cap">
+            <span>上：阻力系数 Cd　下：升力系数 Cl　竖线是当前物理时间</span>
+            <span id="stRead"></span>
+          </div>
+        </div>
+        <aside class="panel readout">
+          <h2 id="caseTitle">圆柱绕流</h2>
+          <div class="sub" id="caseSub"></div>
+          <div class="pill-row">
+            <span class="pill">64×64</span>
+            <span class="pill">域 −8D … 20D</span>
+            <span class="pill" id="pillModel">FNO</span>
+          </div>
+          <div class="kv" id="readKv"></div>
+          <p class="note">相对 L2 按当前帧、流体掩膜计算。全量回放的汇总数字在「双模型分工」页，两套数字不要混读。</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="view" id="page-compare">
+      <div class="compare-head">
+        <div class="panel compare-copy">
+          <div class="kicker">同一套自产数据 · 点格子、拨时间、看谁跟得上</div>
+          <h2>几何泛化交给 UNetEx，<br />时间外推交给 FNO。</h2>
+          <p>点下面任意一个几何，这一页当场对照。UNetEx 只吃形状，预测锁在时间窗中部；FNO 吃前 4 帧，会跟着涡街走。拨时间轴时，左边快照不动、右边场跟着变，分工一眼能看出来。</p>
+          <p class="note">热力图是 UNetEx 全量回放，训练和验证没有按算例隔离。FNO 数字是当前算例现算的。方案基线仍是测试集速度相对 L2 &lt; 5%、压力 &lt; 8%。</p>
+        </div>
+        <div class="panel meters" id="meterBox"></div>
+      </div>
+      <div class="panel deck">
+        <div class="ctrl">
+          <span>热力图看</span>
+          <div class="seg" id="segHeat"></div>
+        </div>
+        <div class="ctrl">
+          <span>对照画面</span>
+          <div class="seg" id="segCompareView"></div>
+        </div>
+        <div class="ctrl">
+          <span>场量</span>
+          <div class="seg" id="segCompareField"></div>
+        </div>
+      </div>
+      <div class="panel matrix-wrap">
+        <h3 id="matrixTitle">UNetEx 换几何</h3>
+        <p class="note" id="matrixHint">横轴是 cy 与 D，纵轴是雷诺数。点一格留在本页加载，不必跳走。</p>
+        <div id="matrix"></div>
+        <div class="hover-card hidden" id="heatTip"></div>
+      </div>
+      <div class="studio-grid compare-stage">
+        <div class="panel stage-wrap">
+          <div class="triptych" id="cmpTriptych">
+            <div class="pane">
+              <label>CFD 真值 <b id="cmpCapCfd"></b></label>
+              <canvas id="cmpCfd" width="840" height="480"></canvas>
+            </div>
+            <div class="pane">
+              <label>UNetEx 快照 <b id="cmpCapUnet"></b></label>
+              <canvas id="cmpUnet" width="840" height="480"></canvas>
+            </div>
+            <div class="pane">
+              <label>FNO 时序 <b id="cmpCapFno"></b></label>
+              <canvas id="cmpFno" width="840" height="480"></canvas>
+            </div>
+          </div>
+          <div class="legend">
+            <span id="cmpScaleMin">0</span>
+            <div class="bar" id="cmpColorBar"></div>
+            <span id="cmpScaleMax">1</span>
+          </div>
+          <div class="timeline">
+            <button type="button" id="cmpPlayBtn">暂停</button>
+            <input id="cmpScrub" type="range" min="0" max="100" value="0" />
+            <span class="mono" id="cmpTimeRead">t = 0</span>
+          </div>
+          <p class="mode-line" id="cmpModeLine"></p>
+        </div>
+        <aside class="panel readout">
+          <h2 id="cmpCaseTitle">选一个几何</h2>
+          <div class="sub" id="cmpCaseSub"></div>
+          <div class="pill-row">
+            <span class="pill">快照 vs 时序</span>
+            <span class="pill" id="cmpPillField">Ux</span>
+          </div>
+          <div class="kv" id="cmpKv"></div>
+          <p class="note">播起来之后看 Uy：快照误差会跟着涡对相位跳，FNO 应当贴着涡核。</p>
+        </aside>
+      </div>
+    </section>
+  </main>
+  <div class="loading hidden" id="loading">正在推理这个几何…</div>
+  <script src="/app.js"></script>
+</body>
+</html>

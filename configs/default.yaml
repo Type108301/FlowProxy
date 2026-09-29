@@ -1,0 +1,81 @@
+project_name: flowproxy
+seed: 42
+
+# AutoDL 数据盘优先；本机则回落到仓库根目录
+paths:
+  autodl_root: /root/autodl-tmp/flowproxy
+  data_raw: data/raw
+  data_processed: data/processed
+  outputs: outputs
+
+physics:
+  shape: cylinder          # cylinder | square
+  D: 1.0
+  U_inf: 1.0
+  cx: 0.0
+  cy: 0.0
+  Re_list: [80, 100, 150, 200]
+  # 几何微扰：圆柱纵向偏移与直径缩放，用于测试泛化
+  cy_offsets: [-0.4, 0.0, 0.4]
+  D_scales: [0.9, 1.0, 1.1]
+
+domain:
+  x_min: -8.0
+  x_max: 20.0
+  y_min: -8.0
+  y_max: 8.0
+  z_span: 0.1
+
+grid:
+  nx: 64
+  ny: 64
+
+cfd:
+  solver: icoFoam
+  end_time: 80.0
+  delta_t: 0.02
+  write_interval: 0.25
+  skip_time: 40.0          # 丢掉启动过渡段
+  n_cells_x: 140
+  n_cells_y: 80
+  snap_level: 2
+  n_procs: 4
+
+data:
+  history_k: 4             # 输入历史帧数
+  future_t: 1              # 一次预测未来帧数；FNO 可改为 8
+  train_ratio: 0.7
+  val_ratio: 0.15
+  # 测试集至少留未见 Re 与未见几何
+  holdout_re: [200]
+  holdout_geometry: ["cylinder_cy0.4_D1.0"]
+
+train:
+  device: cuda
+  epochs: 200
+  batch_size: 8
+  lr: 0.001
+  weight_decay: 0.005
+  patience: 40
+  num_workers: 2
+  amp: true
+  lambda_div: 0.05         # 连续性残差权重；0 则只监控不回传
+  lambda_wall: 0.02
+
+unetex:
+  filters: [8, 16, 32, 32]
+  kernel_size: 5
+  layers: 2
+  batch_norm: false
+  weight_norm: false
+
+fno:
+  n_modes: [16, 16]
+  hidden_channels: 32
+  n_layers: 4
+  lifting_channels: 64
+  projection_channels: 64
+
+vis:
+  n_show: 4
+  cmap: jet

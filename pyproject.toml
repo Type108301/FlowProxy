@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flowproxy"
+version = "0.1.0"
+description = "OpenFOAM + UNetEx/FNO 二维流场神经代理预测"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "AIC AI+Fluid team" }]
+dependencies = [
+  "numpy>=1.23",
+  "scipy>=1.9",
+  "h5py>=3.8",
+  "pyyaml>=6.0",
+  "torch>=2.0",
+  "matplotlib>=3.7",
+  "tqdm>=4.65",
+]
+
+[project.optional-dependencies]
+vtk = ["meshio>=5.3", "pyvista>=0.43"]
+app = ["streamlit>=1.28", "plotly>=5.18"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

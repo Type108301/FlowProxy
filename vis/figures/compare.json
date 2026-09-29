@@ -1,0 +1,24 @@
+[
+  {
+    "rel_l2_ux": 0.05378260537981987,
+    "rel_l2_uy": 0.7250614583492279,
+    "rel_l2_p": 0.34361848533153533,
+    "mse": 0.003583206539042294,
+    "rel_l2_mean": 0.37415419816970824,
+    "model": "unetex",
+    "task": "snapshot",
+    "n_test": 36,
+    "ckpt": "/root/autodl-tmp/flowproxy/outputs/checkpoints/unetex_snapshot/best.pt"
+  },
+  {
+    "rel_l2_ux": 0.012189141376079946,
+    "rel_l2_uy": 0.08338923727661825,
+    "rel_l2_p": 0.0814294432437028,
+    "mse": 0.00020763176923261262,
+    "rel_l2_mean": 0.0590026089719944,
+    "model": "fno",
+    "task": "sequence",
+    "n_test": 9972,
+    "ckpt": "/root/autodl-tmp/flowproxy/outputs/checkpoints/fno_sequence/best.pt"
+  }
+]

@@ -1,0 +1,42 @@
+# data and runs
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/splits/*.json
+cfd/runs/
+outputs/
+*.pt
+*.pth
+*.h5
+*.hdf5
+*.npz
+*.pkl
+*.foam
+VTK/
+processor*/
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.eggs/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# os / ide
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# logs
+*.log
+wandb/
+lightning_logs/
+
+# extracted notes
+_proposal_extract.txt
